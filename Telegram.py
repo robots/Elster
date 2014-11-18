@@ -1,9 +1,10 @@
 
 
-import TelegramType
+from TelegramType import TelegramType
 import ModuleType
 
 import struct
+from Elster import Elster
 
 
 class Telegram(object):
@@ -146,7 +147,18 @@ class Telegram(object):
 
 	def get_data_long(self):
 		return self._data[6] | (self._data[7] << 8) | (self._data[8] << 16) | (self._data[9] << 24)
-		
+
+	def __repr__(self):
+		canid_from = (self.from_type << 7) + self.from_addr
+		canid_to = (self.to_type << 7) + self.to_addr
+		el = Elster()
+
+		if self.tgr_type == TelegramType.READ:
+			s = "0x%03x -> 0x%03x (%s) %s" % (canid_from, canid_to, TelegramType.to_string(self.tgr_type), el.var_name(self.tgr_number)
+		else:
+			s = "0x%03x -> 0x%03x (%s) %s = %s" % (canid_from, canid_to, TelegramType.to_string(self.tgr_type), el.var_name(self.tgr_number), el.get_value(self))
+
+		return s
 
 	def show(self):
 		print "%02d:%02d -> %02d:%02d (%02d, %02d)" % (self.from_type, self.from_addr, self.to_type, self.to_addr, self.tgr_type, self.tgr_number)

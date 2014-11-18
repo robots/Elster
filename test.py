@@ -16,3 +16,4 @@ tg.tgr_number = 0x0b
 
 print tg.to_data()
 print ModuleType.ModuleType.to_string(10)
+print repr(tg)
