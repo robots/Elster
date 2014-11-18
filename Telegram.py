@@ -154,7 +154,7 @@ class Telegram(object):
 		el = Elster()
 
 		if self.tgr_type == TelegramType.READ:
-			s = "0x%03x -> 0x%03x (%s) %s" % (canid_from, canid_to, TelegramType.to_string(self.tgr_type), el.var_name(self.tgr_number)
+			s = "0x%03x -> 0x%03x (%s) %s" % (canid_from, canid_to, TelegramType.to_string(self.tgr_type), el.var_name(self.tgr_number))
 		else:
 			s = "0x%03x -> 0x%03x (%s) %s = %s" % (canid_from, canid_to, TelegramType.to_string(self.tgr_type), el.var_name(self.tgr_number), el.get_value(self))
 
