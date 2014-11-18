@@ -41,9 +41,4 @@ while True:
 	# send space, keepalive for server (gets dropped anyways)
 	s.send(' ')
 
-	
 
-print "Devices discovered:"
-for dev in devices:
-	canid = (dev[0] << 7) + dev[1]
-	print "Canid: 0x%03x type: 0x%02x addr: 0x02x" % (canid, dev[0], dev[1])
