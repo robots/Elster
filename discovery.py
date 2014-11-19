@@ -38,7 +38,7 @@ while True:
 		if '\n' not in data:
 			continue
 		
-		frame, data = data.split('\n')
+		frame, data = data.split('\n', 1)
 		print frame
 		if len(frame) >= 24:
 			rt.from_data(frame)
@@ -61,9 +61,9 @@ while True:
 		st.tgr_type = 1
 		st.tgr_number = 0x0b
 	
-		print st.to_data()
+		print str(st)
 #		break
-		s.send(st.to_data() + '\n')
+		s.send(str(st) + '\n')
 
 		state = 1
 		timeout = 0

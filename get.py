@@ -84,9 +84,9 @@ while True:
 		st.tgr_type = TelegramType.READ
 		st.tgr_number = varidx
 	
-#		print st.to_data()
+#		print str(st)
 #		break
-		s.send(st.to_data() + '\n')
+		s.send(str(st) + '\n')
 
 		state = 1
 		timeout = 0

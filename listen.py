@@ -29,7 +29,7 @@ while True:
 		if '\n' not in data:
 			continue
 		
-		frame, data = data.split('\n')
+		frame, data = data.split('\n', 1)
 #		print frame
 		if len(frame) >= 24:
 			ts = time.time()
