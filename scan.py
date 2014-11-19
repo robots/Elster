@@ -21,13 +21,16 @@ scan_module_idx = 0
 scan_busaddr_max = 15
 scan_busaddr = 0
 
-state = 3
+state = 0
 timeout = 0
 
 #devices = [(0,0), (12, 1), (6, 1),(3, 0),(9, 0)]
-devices = [(12, 1), (6, 1),(3, 0),(9, 0)]
+devices = []
+#devices = [(12, 1)]
 device_idx = 0
+
 variable_idx = 0
+variable_max = 0x10000
 
 fo = open("scanout.inc","w")
 
@@ -63,11 +66,12 @@ while True:
 			elif state >= 3:
 				# print response in scanner mode
 				canid = (rt.from_type << 7) + rt.from_addr
-				var_data = rt.get_data_short()
-				print "%03x: %s = %s" % (canid, el.var_name(rt.tgr_number), el.get_value(rt))
-				sline = "  { 0x%03x, 0x%04x, 0x%04x}," % (canid, rt.tgr_number, var_data)
-				if var_data != 0x8000:
-					fo.write(sline + '\n')
+				var_data = rt.value
+				if rt.is_response(st):
+					print "%03x: %s = %s" % (canid, el.var_name(rt.tgr_number), el.get_value(rt))
+					sline = "  { 0x%03x, 0x%04x, 0x%04x}," % (canid, rt.tgr_number, var_data)
+					if var_data != 0x8000:
+						fo.write(sline + '\n')
 
 
 	if state == 0:
@@ -78,9 +82,9 @@ while True:
 		st.tgr_type = 1
 		st.tgr_number = 0x0b
 	
-		print st.to_data()
+		print str(st)
 #		break
-		s.send(st.to_data() + '\n')
+		s.send(str(st) + '\n')
 
 		state = 1
 		timeout = 0
@@ -96,19 +100,19 @@ while True:
 			scan_module_idx += 1
 
 			if scan_module_idx >= len(scan_modules):
-				# we are done, exit discovery, start scanning
-				state = 3
+				# we are done, exit discovery, print and then start scanning
+				state = 5
 				continue
 
 		state = 0
 	elif state == 3:
-		if variable_idx == 0x10000:
+		if variable_idx == variable_max:
 			#last variable read, advance device
 			device_idx += 1
 			if device_idx >= len(devices):
 				# we are done, wait some time for answers to arrive
 				timeout = 0
-				state == 4
+				state = 4
 
 		
 		dev = devices[device_idx]
@@ -117,8 +121,8 @@ while True:
 		st.tgr_type = 1
 		st.tgr_number = variable_idx
 
-		print st.to_data()
-		s.send(st.to_data() + '\n')
+		print str(st)
+		s.send(str(st) + '\n')
 
 		variable_idx += 1
 		
@@ -134,6 +138,11 @@ while True:
 			s.close()
 			break
 
+	elif state == 5:
+		print "Devices discovered:"
+		for dev in devices:
+			print dev
+		state = 3
 
 	else:
 		# send space, keepalive for server (gets dropped anyways)
@@ -141,6 +150,3 @@ while True:
 
 	
 fo.close()
-print "Devices discovered:"
-for dev in devices:
-	print dev
