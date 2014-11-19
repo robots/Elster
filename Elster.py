@@ -51,7 +51,7 @@ class Elster:
 
 	def get_value(self, telegram):
 		idx = telegram.tgr_number
-		val = telegram.get_data_short()
+		val = telegram.value
 
 		t = self.var_type(idx)
 
@@ -68,7 +68,7 @@ class Elster:
 		elif t == ElsterType.et_mil_val:
 			return "%.3f" % (val/1000.)
 		elif t == ElsterType.et_little_endian:
-			return "%d" % (val >> 8 + 256*(val & 0xff))
+			return "%d" % ((val >> 8) + 256*(val & 0xff))
 		elif t == ElsterType.et_zeit:
 			return "%02d:%02d" % (val & 0xff, val >> 8)
 		elif t == ElsterType.et_datum:
