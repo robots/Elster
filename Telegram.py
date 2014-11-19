@@ -61,8 +61,8 @@ class Telegram(object):
 	@to_addr.setter
 	def to_addr(self, to_addr):
 #		print "setting toaddr", to_addr
-		if to_addr < 0 or to_addr > 0x0f:
-			raise Exception("Out of range")
+#		if to_addr < 0 or to_addr > 0x0f:
+#			raise Exception("Out of range")
 
 		self._data[4] = to_addr
 	
@@ -123,14 +123,13 @@ class Telegram(object):
 		else:
 			self._data[5] = nr
 
-#	def set_data(self, data):
-#		if not len(data) == 4:
-#			raise Exception("Data needs to be 4 long")
-#
-#		self._data[6:] = data
-#
-#	def get_data(self)
-#		return self._data[6:10]
+	@property
+	def value(self):
+		return self.get_data_short()
+
+	@value.setter
+	def value(self, data):
+		self.set_data_short(data)
 
 	def set_data_short(self, short):
 		idx = 6
@@ -148,6 +147,18 @@ class Telegram(object):
 	def get_data_long(self):
 		return self._data[6] | (self._data[7] << 8) | (self._data[8] << 16) | (self._data[9] << 24)
 
+	def is_response(self, tg):
+		#FIXME: READ -> ACK? is that correct?
+		if self.to_addr == tg.from_addr and self.to_type == tg.from_type and self.tgr_number == tg.tgr_number:
+			if self.tgr_type == TelegramType.READ and (tg.tgr_type == TelegramType.RESPOND or tg.tgr_type == TelegramType.ACKNOWLEDGE):
+				return True
+			if self.tgr_type == TelegramType.WRITE and (tg.tgr_type == TelegramType.WRITE_RESPOND or tg.tgr_type == TelegramType.WRITE_ACKNOWLEDGE):
+				return True
+			if self.tgr_type == TelegramType.SYSTEM and tg.tgr_type == TelegramType.RESPONDSYSTEM:
+				return True
+
+		return False
+
 	def __repr__(self):
 		canid_from = (self.from_type << 7) + self.from_addr
 		canid_to = (self.to_type << 7) + self.to_addr
@@ -159,6 +170,9 @@ class Telegram(object):
 			s = "0x%03x -> 0x%03x (%s) %s = %s" % (canid_from, canid_to, TelegramType.to_string(self.tgr_type), el.var_name(self.tgr_number), el.get_value(self))
 
 		return s
+
+	def __str__(self):
+		return self.to_data()
 
 	def show(self):
 		print "%02d:%02d -> %02d:%02d (%02d, %02d)" % (self.from_type, self.from_addr, self.to_type, self.to_addr, self.tgr_type, self.tgr_number)
